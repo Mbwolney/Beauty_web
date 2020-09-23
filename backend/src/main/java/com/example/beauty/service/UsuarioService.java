@@ -1,5 +1,7 @@
 package com.example.beauty.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,4 +17,9 @@ public class UsuarioService {
 	public void save(Usuario usuario) {
 		usuarioRepository.save(usuario);
 	}
+
+	public Optional<Usuario> findByCpf(String cpf) {
+		return usuarioRepository.findByCPF(cpf);
+	}
+
 }

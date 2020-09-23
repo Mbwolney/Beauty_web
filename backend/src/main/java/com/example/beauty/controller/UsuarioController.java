@@ -1,12 +1,11 @@
 package com.example.beauty.controller;
 
-import java.security.NoSuchAlgorithmException;
-
 import javax.validation.Valid;
 
-import org.apache.logging.log4j.message.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,16 +27,30 @@ public class UsuarioController {
 
 	/**
 	 * Cadastrar Usuário
+	 * 
 	 * @param usuario
+	 * @param result
 	 * @return
-	 * @throws NoSuchAlgorithmException
 	 */
 	@PostMapping
-	public ResponseEntity<Response<Usuario>> cadastrarUsuario(@Valid @RequestBody Usuario usuario)
-			throws NoSuchAlgorithmException {
+	public ResponseEntity<Response<Usuario>> cadastrarUsuario(@Valid @RequestBody Usuario usuario,
+			BindingResult result) {
 		Response<Usuario> response = new Response<Usuario>();
+		validarUsuarioExistente(usuario, result);
+		if (result.hasErrors()) {
+			result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
+			return ResponseEntity.badRequest().body(response);
+		}
 		usuario.setPerfil(PerfilEnum.ROLE_USUARIO);
 		service.save(usuario);
+		response.setData(usuario);
 		return ResponseEntity.created(null).body(response);
 	}
+	
+	
+	private void validarUsuarioExistente(Usuario usuario, BindingResult result) {
+		this.service.findByCpf(usuario.getCpf())
+				.ifPresent(usu -> result.addError(new ObjectError("usuario", "Usuário já Existente")));
+	}
+
 }

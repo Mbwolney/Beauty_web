@@ -3,9 +3,6 @@ package com.example.beauty.response;
 import java.util.ArrayList;
 import java.util.List;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Response<T> {
 
 	private T data;
