@@ -1,38 +1,28 @@
-package com.example.beauty.entity;
+package com.example.beauty.dto;
 
-import javax.persistence.Entity;
+import java.util.Optional;
+
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.hibernate.validator.constraints.br.CPF;
 
 import com.example.beauty.entity.enums.PerfilEnum;
 
 import lombok.Data;
 
-@Entity
 @Data
-public class Usuario {
+public class UsuarioDto {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@NotEmpty(message = "Nome não pode ser Vazio")
 	private String nome;
-	@NotEmpty(message = "CPF não pode ser Vazio")
-	@CPF
-	private String cpf;
 	@NotEmpty(message = "Email não pode ser Vazio")
 	@Email
 	private String email;
-	@NotEmpty(message = "Senha não pode ser Vazio")
-	private String senha;
+	private String cpf;
+	private Optional<String> senha = Optional.empty();
 	@Enumerated(EnumType.STRING)
 	private PerfilEnum perfil;
-
 }
