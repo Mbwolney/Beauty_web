@@ -1,6 +1,7 @@
 package com.example.beauty.controller;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,6 +10,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,10 +21,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.beauty.dto.FunSerDto;
 import com.example.beauty.dto.FuncionarioDto;
+import com.example.beauty.dto.ServicoDto;
 import com.example.beauty.entity.Funcionario;
+import com.example.beauty.entity.Servico;
+import com.example.beauty.entity.Usuario;
 import com.example.beauty.response.Response;
 import com.example.beauty.service.FuncionarioService;
+import com.example.beauty.service.ServicoService;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -31,6 +38,9 @@ public class FuncionarioController {
 
 	@Autowired
 	private FuncionarioService service;
+
+	@Autowired
+	private ServicoService servicoService;
 
 	/**
 	 * Salvar Funcionário
@@ -44,6 +54,7 @@ public class FuncionarioController {
 	public ResponseEntity<Response<Funcionario>> cadastrarFuncionario(@Valid @RequestBody Funcionario funcionario,
 			BindingResult result) throws NoSuchAlgorithmException {
 		Response<Funcionario> response = new Response<Funcionario>();
+		validarDadosExistente(funcionario, result);
 		if (result.hasErrors()) {
 			result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
 			return ResponseEntity.badRequest().body(response);
@@ -84,41 +95,71 @@ public class FuncionarioController {
 
 	/**
 	 * Alterar Funcionário
-	 * 
 	 * @param id
-	 * @param funcionario
+	 * @param funcionarioDto
 	 * @param result
 	 * @return
-	 * @throws NoSuchAlgorithmException
 	 */
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<Response<Funcionario>> alterar(@PathVariable("id") Long id,
-			@Valid @RequestBody FuncionarioDto funcionarioDto, BindingResult result) throws NoSuchAlgorithmException {
-		Response<Funcionario> response = new Response<Funcionario>();
-		Optional<Funcionario> funcionarioService = this.service.findById(id);
-		if (!funcionarioService.isPresent()) {
+	public ResponseEntity<Response<FunSerDto>> alterar(@PathVariable("id") Long id,
+			@Valid @RequestBody FunSerDto funSerDto, BindingResult result) {
+		Response<FunSerDto> response = new Response<FunSerDto>();
+		
+		Optional<Funcionario> funcionarioId = this.service.findById(id);
+		if (!funcionarioId.isPresent()) {
 			return ResponseEntity.notFound().build();
 		}
-		this.atualizarDadosFuncionarios(funcionarioService.get(), funcionarioDto, result);
+		
+		Funcionario funcionario = this.converterDtoFuncionario(funSerDto);
+		Servico servico = this.converterDtoServico(funSerDto);
+		List<Servico> servicos = new ArrayList<Servico>();
+		servicos.add(servico);
+		
 		if (result.hasErrors()) {
 			result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
 			return ResponseEntity.badRequest().body(response);
 		}
-		this.service.save(funcionarioService.get());
-		response.setData(funcionarioService.get());
+		this.servicoService.save(servico);
+		funcionario.setServico(servicos);
+		this.service.save(funcionario);
+		//response.setData(servicoId.get());
 		return ResponseEntity.ok(response);
 	}
 
 	/**
-	 * Atualizar dados dos Funcionários apartir do Funcionário DTO
+	 * Converter DTO para Funcionário
 	 * 
 	 * @param funcionario
 	 * @param funcionarioDto
 	 * @param result
 	 * @throws NoSuchAlgorithmException
 	 */
-	private void atualizarDadosFuncionarios(Funcionario funcionario, FuncionarioDto funcionarioDto,
-			BindingResult result) throws NoSuchAlgorithmException {
-		funcionario.setNome(funcionarioDto.getNome());
+	private Funcionario converterDtoFuncionario(FunSerDto funSerDto) {
+		Funcionario funcionario = new Funcionario();
+		funcionario.setNome(funSerDto.getNome());
+		return funcionario;
 	}
+
+	/**
+	 * Converter DTO para Serviço
+	 * 
+	 * @param funSerDto
+	 * @return
+	 */
+	private Servico converterDtoServico(FunSerDto funSerDto) {
+		Servico servico = this.servicoService.findById(funSerDto.getServico()).get();
+		return servico;
+	}
+
+	/**
+	 * Validar se Funcionário Existe
+	 * 
+	 * @param funcionario
+	 * @param result
+	 */
+	private void validarDadosExistente(Funcionario funcionario, BindingResult result) {
+		this.service.findByNome(funcionario.getNome())
+				.ifPresent(usu -> result.addError(new ObjectError("funcionario", "Funcionário já Existente")));
+	}
+
 }

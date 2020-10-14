@@ -44,6 +44,16 @@ public class FuncionarioService {
 	}
 
 	/**
+	 * Buscar por nome
+	 * 
+	 * @param nome
+	 * @return
+	 */
+	public Optional<Funcionario> findByNome(String nome) {
+		return funcionarioRepository.findByNome(nome);
+	}
+
+	/**
 	 * Deletar Funcionário
 	 * 
 	 * @param funcionario
