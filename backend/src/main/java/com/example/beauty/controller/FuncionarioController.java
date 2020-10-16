@@ -23,10 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.beauty.dto.FunSerDto;
 import com.example.beauty.dto.FuncionarioDto;
-import com.example.beauty.dto.ServicoDto;
 import com.example.beauty.entity.Funcionario;
 import com.example.beauty.entity.Servico;
-import com.example.beauty.entity.Usuario;
 import com.example.beauty.response.Response;
 import com.example.beauty.service.FuncionarioService;
 import com.example.beauty.service.ServicoService;
@@ -95,60 +93,43 @@ public class FuncionarioController {
 
 	/**
 	 * Alterar Funcionário
+	 * 
 	 * @param id
 	 * @param funcionarioDto
 	 * @param result
 	 * @return
 	 */
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<Response<FunSerDto>> alterar(@PathVariable("id") Long id,
+	public ResponseEntity<Response<FuncionarioDto>> alterar(@PathVariable("id") Long id,
 			@Valid @RequestBody FunSerDto funSerDto, BindingResult result) {
-		Response<FunSerDto> response = new Response<FunSerDto>();
-		
-		Optional<Funcionario> funcionarioId = this.service.findById(id);
-		if (!funcionarioId.isPresent()) {
+		Response<FuncionarioDto> response = new Response<FuncionarioDto>();
+		Optional<Funcionario> funcionario = this.service.findById(id);
+		if (!funcionario.isPresent()) {
 			return ResponseEntity.notFound().build();
 		}
-		
-		Funcionario funcionario = this.converterDtoFuncionario(funSerDto);
-		Servico servico = this.converterDtoServico(funSerDto);
-		List<Servico> servicos = new ArrayList<Servico>();
-		servicos.add(servico);
-		
+		this.atualizarDadosFuncionario(funcionario.get(), funSerDto, result);
 		if (result.hasErrors()) {
 			result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
 			return ResponseEntity.badRequest().body(response);
 		}
-		this.servicoService.save(servico);
-		funcionario.setServico(servicos);
-		this.service.save(funcionario);
-		//response.setData(servicoId.get());
+		this.service.save(funcionario.get());
+		response.setData(this.converterFuncionarioDto(funcionario.get()));
 		return ResponseEntity.ok(response);
 	}
 
 	/**
-	 * Converter DTO para Funcionário
+	 * Atualiza dados do Funcionário apartir do DTO
 	 * 
 	 * @param funcionario
-	 * @param funcionarioDto
-	 * @param result
-	 * @throws NoSuchAlgorithmException
-	 */
-	private Funcionario converterDtoFuncionario(FunSerDto funSerDto) {
-		Funcionario funcionario = new Funcionario();
-		funcionario.setNome(funSerDto.getNome());
-		return funcionario;
-	}
-
-	/**
-	 * Converter DTO para Serviço
-	 * 
 	 * @param funSerDto
-	 * @return
+	 * @param result
 	 */
-	private Servico converterDtoServico(FunSerDto funSerDto) {
-		Servico servico = this.servicoService.findById(funSerDto.getServico()).get();
-		return servico;
+	private void atualizarDadosFuncionario(Funcionario funcionario, FunSerDto funSerDto, BindingResult result) {
+		funcionario.setNome(funSerDto.getNome());
+		if (funSerDto.getServico().isPresent()) {
+			Optional<Servico> servico = this.servicoService.findById(funSerDto.getServico().get());
+			funcionario.getServico().add(servico.get());
+		}
 	}
 
 	/**
@@ -160,6 +141,14 @@ public class FuncionarioController {
 	private void validarDadosExistente(Funcionario funcionario, BindingResult result) {
 		this.service.findByNome(funcionario.getNome())
 				.ifPresent(usu -> result.addError(new ObjectError("funcionario", "Funcionário já Existente")));
+	}
+
+	private FuncionarioDto converterFuncionarioDto(Funcionario funcionario) {
+		FuncionarioDto funcionarioDto = new FuncionarioDto();
+		funcionarioDto.setId(funcionario.getId());
+		funcionarioDto.setNome(funcionario.getNome());
+		funcionarioDto.setServico(funcionario.getServico());
+		return funcionarioDto;
 	}
 
 }
