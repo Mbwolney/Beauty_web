@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.beauty.entity.Funcionario;
+import com.example.beauty.entity.Servico;
 import com.example.beauty.repository.FuncionarioRepository;
 
 @Service
@@ -51,6 +52,10 @@ public class FuncionarioService {
 	 */
 	public Optional<Funcionario> findByNome(String nome) {
 		return funcionarioRepository.findByNome(nome);
+	}
+	
+	public Optional<Funcionario> findByServico(Servico servico){
+		return funcionarioRepository.findByServico(servico);
 	}
 
 	/**

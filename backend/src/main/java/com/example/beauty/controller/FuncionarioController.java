@@ -1,7 +1,6 @@
 package com.example.beauty.controller;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -126,9 +125,19 @@ public class FuncionarioController {
 	 */
 	private void atualizarDadosFuncionario(Funcionario funcionario, FunSerDto funSerDto, BindingResult result) {
 		funcionario.setNome(funSerDto.getNome());
+		boolean verificar = false;
 		if (funSerDto.getServico().isPresent()) {
 			Optional<Servico> servico = this.servicoService.findById(funSerDto.getServico().get());
-			funcionario.getServico().add(servico.get());
+			for (int i = 0; i < funcionario.getServico().size(); i++) {
+				if (funcionario.getServico().get(i) == servico.get()) {
+					verificar = true;
+				}
+			}
+			if (verificar == true) {
+				funcionario.getServico().remove(servico.get());
+			} else {
+				funcionario.getServico().add(servico.get());
+			}
 		}
 	}
 
