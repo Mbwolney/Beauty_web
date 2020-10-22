@@ -1,11 +1,14 @@
 package com.example.beauty.entity;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -34,5 +37,7 @@ public class Usuario {
 	private String senha;
 	@Enumerated(EnumType.STRING)
 	private PerfilEnum perfil;
+	@OneToMany(mappedBy = "usuario")
+	private List<Agendamento> agendamento;
 
 }

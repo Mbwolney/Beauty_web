@@ -53,8 +53,14 @@ public class FuncionarioService {
 	public Optional<Funcionario> findByNome(String nome) {
 		return funcionarioRepository.findByNome(nome);
 	}
-	
-	public Optional<Funcionario> findByServico(Servico servico){
+
+	/**
+	 * Buscar Funcionário por Serviço
+	 * 
+	 * @param servico
+	 * @return
+	 */
+	public Optional<Funcionario> findByServico(Servico servico) {
 		return funcionarioRepository.findByServico(servico);
 	}
 
