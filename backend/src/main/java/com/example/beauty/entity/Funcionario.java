@@ -7,8 +7,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
 import org.hibernate.validator.constraints.NotEmpty;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 
@@ -23,4 +26,7 @@ public class Funcionario {
 	private String nome;
 	@ManyToMany
 	private List<Servico> servico;
+	@OneToMany
+	@JsonIgnore
+	private List<Agendamento> agendamento;
 }

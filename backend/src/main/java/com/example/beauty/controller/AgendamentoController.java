@@ -37,9 +37,4 @@ public class AgendamentoController {
 
 		return null;
 	}
-
-	private void validarDadosExistente(Agendamento agendamento, BindingResult result) {
-		
-	}
-
 }

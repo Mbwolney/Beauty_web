@@ -83,6 +83,23 @@ public class ServicoController {
 	}
 
 	/**
+	 * Buscar por Id
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@GetMapping(value = "/{id}")
+	public ResponseEntity<Response<Servico>> findById(@PathVariable("id") Long id) {
+		Response<Servico> response = new Response<Servico>();
+		Optional<Servico> servico = this.service.findById(id);
+		if (!servico.isPresent()) {
+			return ResponseEntity.notFound().build();
+		}
+		response.setData(servico.get());
+		return ResponseEntity.ok(response);
+	}
+
+	/**
 	 * Atualizar Serviço
 	 * 
 	 * @param id

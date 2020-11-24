@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -28,7 +29,7 @@ public class Servico {
 	@ManyToMany(mappedBy = "servico")
 	@JsonIgnore
 	private List<Funcionario> funcionario;
-	@ManyToMany(mappedBy = "servico")
+	@OneToMany(mappedBy = "servico")
 	@JsonIgnore
 	private List<Agendamento> agendamento;
 

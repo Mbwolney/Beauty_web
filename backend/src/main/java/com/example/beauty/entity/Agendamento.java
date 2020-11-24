@@ -23,8 +23,10 @@ public class Agendamento {
 	private Long id;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date data;
-	@ManyToMany
-	private List<Servico> servico;
+	@ManyToOne
+	private Servico servico;
+	@ManyToOne
+	private Funcionario funcionario;
 	@ManyToOne
 	private Usuario usuario;
 }
