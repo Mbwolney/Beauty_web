@@ -1,9 +1,12 @@
 package com.example.beauty.service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.beauty.entity.Agendamento;
@@ -42,7 +45,7 @@ public class AgendamentoService {
 	 * @param funcionario
 	 * @return
 	 */
-	public Optional<Agendamento> findByFuncionario(Funcionario funcionario) {
+	public List<Agendamento> findByFuncionario(Funcionario funcionario) {
 		return agendamentoRepository.findByFuncionario(funcionario);
 	}
 
@@ -54,6 +57,15 @@ public class AgendamentoService {
 	 */
 	public Optional<Agendamento> findByServico(Servico servico) {
 		return agendamentoRepository.findByServico(servico);
+	}
+
+	/**
+	 * Busca todos os Agendamentos
+	 * 
+	 * @return
+	 */
+	public List<Agendamento> getAgendamento() {
+		return agendamentoRepository.findAll();
 	}
 
 }

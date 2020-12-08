@@ -15,6 +15,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.constraints.br.CPF;
 
 import com.example.beauty.entity.enums.PerfilEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 
@@ -38,6 +39,7 @@ public class Usuario {
 	@Enumerated(EnumType.STRING)
 	private PerfilEnum perfil;
 	@OneToMany(mappedBy = "usuario")
+	@JsonIgnore
 	private List<Agendamento> agendamento;
 
 }
